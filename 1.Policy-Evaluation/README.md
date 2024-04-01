@@ -25,14 +25,15 @@ The method is_terminal will return false as long as we do not reach the terminal
 `def interaction(self, state, action): #state is a list x, y`.
 
 Then if the the state is terminal, we return 0 for the reward and return the state
-```
+```python
         if self.is_terminal(state):
             return state, 0
 ```
 Next we define a function to check whether or not the action that we take will take the agent out of bounds. THe if statement simply checks if the agent is at boundary index and if the next state after the action will be an index that is out of bounds of the 5 by 5 grid. 
-```
+```python
         def outOfBounds(state, action):
-            if (state[0] + action[0] == -1 or state[0] + action[0] == 5 or state[1] + action[1] == -1 or state[1] + action[1] == 5):
+            if (state[0] + action[0] == -1 or state[0] + action[0] == 5
+                or state[1] + action[1] == -1 or state[1] + action[1] == 5):
                 return True
             else: 
                 return False
@@ -42,7 +43,7 @@ Then, we can calculate the reward and next state through the following logic:
 2. check if the action will take the agent out of bounds using the outOfBounds function. If it does take the agent out of bounds, give a reward of -1 and do not update the state.
 3. Otherwise, give a reward of 0 and update the state according to the action. 
 4. return the next_state and the reward 
-```
+```python
         next_state = [0, 0]
         if state[0] == 0 and state[1] == 1: 
             reward = 10
@@ -63,26 +64,27 @@ Then, we can calculate the reward and next state through the following logic:
         return next_state, reward
 ```
 Lastly, the size method will simply return the width and height of the grid: 
-```
+```python
     def size(self):
         return self.width, self.height
 ```
 # determining value function in main.py 
 Now, in main.py we first import the necssary dependencies and the class definition from environment.py:
-```
+```python
 import numpy as np
 from environment import grid_world
 from visualize import draw_image
 ```
 Then we define the size of the world, and a dictionary for the actions to be taken. The actions are simple as they will simply be an array that dictates which diretion the agent should take: 
-```
+```python
 WORLD_SIZE = 5
 # left, up, right, down
-ACTIONS = {'LEFT':np.array([0, -1]), 'UP':np.array([-1, 0]), 'RIGHT':np.array([0, 1]), 'DOWM':np.array([1, 0])}
+ACTIONS = {'LEFT':np.array([0, -1]), 'UP':np.array([-1, 0]),
+'RIGHT':np.array([0, 1]), 'DOWM':np.array([1, 0])}
 ACTION_PROB = 0.25
 ```
 Next, the evaluate_state_value_by_matrix inversion will determine the value function for this MDP. First, we initialize the width and height by `WIDTH, HEIGHT = env.size()` . Then we will create the reward matrix: 
-```
+```python
     R = np.zeros((WIDTH, HEIGHT))
     for i in range(WIDTH):
         for j in range(HEIGHT):
@@ -97,7 +99,7 @@ The reward matrix is calculated by first creating a matrix R filled with zeros t
 
 
 Next, the transition matrix can be created by creating a matrix P that has width and height that is width*height. This must be done because the transition matrix indices represent the transition from current state to next state. Thus, for each current state there will be width\*height possible next states. 
-```
+```python
     P = np.zeros((WIDTH*HEIGHT, WIDTH*HEIGHT))
     for i in range(WIDTH):
         for j in range(HEIGHT):
@@ -121,7 +123,7 @@ lastly, to calculate the value function, we can use the matrix form of the bellm
 
 
 This can be completed simply through numpy methods and then we can reshape the matrix to our desired width and height (5 by 5)
-```
+```python
     V = np.linalg.inv(np.eye(WIDTH*HEIGHT) - discount*P).dot(R)         
 
     new_state_values = V.reshape(WIDTH,HEIGHT)
@@ -130,7 +132,7 @@ Lastly, we return the new matrix.
 
 
 The main function is simple:
-```
+```python
 if __name__ == '__main__':
     env = grid_world()
     values = evaluate_state_value_by_matrix_inversion(env = env)
