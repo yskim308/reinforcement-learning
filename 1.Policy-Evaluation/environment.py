@@ -48,11 +48,11 @@ class grid_world:
     def size(self):
         return self.width, self.height
 
-env = grid_world()
-ACTIONS = {'LEFT':np.array([0, -1]), 'UP':np.array([-1, 0]), 'RIGHT':np.array([0, 1]), 'DOWM':np.array([1, 0])}
-for i in range(HEIGHT):
-    for j in range(WIDTH): 
-        for action in ACTIONS:
-            (next_i, next_j), reward = env.interaction([i,j], ACTIONS[action])
-            print(f'at position {i}, {j}, the action {action} is taken and the new position is {next_i}, {next_j} with reward {reward}')
-        print("\n")
+#env = grid_world()
+#ACTIONS = {'LEFT':np.array([0, -1]), 'UP':np.array([-1, 0]), 'RIGHT':np.array([0, 1]), 'DOWM':np.array([1, 0])}
+#for i in range(HEIGHT):
+#    for j in range(WIDTH): 
+#        for action in ACTIONS:
+#            (next_i, next_j), reward = env.interaction([i,j], ACTIONS[action])
+#            print(f'at position {i}, {j}, the action {action} is taken and the new position is {next_i}, {next_j} with reward {reward}')
+#        print("\n")

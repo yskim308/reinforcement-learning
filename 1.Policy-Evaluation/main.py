@@ -21,7 +21,6 @@ def evaluate_state_value_by_matrix_inversion(env, discount=0.9):
                 (next_i, next_j), reward = env.interaction([i, j], ACTIONS[action])
                 expected_reward += ACTION_PROB*reward
             R[i, j] = expected_reward
-    print(R)
     R = R.reshape((-1,1))
 
     # Transition matrix  
@@ -34,7 +33,6 @@ def evaluate_state_value_by_matrix_inversion(env, discount=0.9):
                 next_state = next_i*HEIGHT + next_j
                 P[current_state, next_state] += ACTION_PROB
         
-    print(P)
     #invert matrix to calculate V 
     V = np.linalg.inv(np.eye(WIDTH*HEIGHT) - discount*P).dot(R)         
 
