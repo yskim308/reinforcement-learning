@@ -142,6 +142,8 @@ We create an grid_world object. Then we call the function to display the values.
 # analysis of value function result 
 The result of the calculation of the value function is shown below: 
 ![value-function](./images/valuefunction.png)
+
+
 The results show the state-value function. First, the values near the edge are low. This is because there is a higher probability that the agent will go out of bounds. The edge states are lower near the bottom because the getting to the best valued states (A and B) is harder when further away 
 
 
