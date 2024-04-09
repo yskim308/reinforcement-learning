@@ -18,7 +18,7 @@ first, we must set up the envrionment controller object:
         x, y = state
         return False
 ```
-First, the constructor sets the width and height of the grid to the the specified wwidth and height by the constants `HEIGHT = 5` and `WIDTH = 5`
+First, the constructor sets the width and height of the grid to the the specified width and height by the constants `HEIGHT = 5` and `WIDTH = 5`
 
 
 The method is_terminal will return false as long as we do not reach the terminal state. Next we have to create the method for interaction. First, the method will receieve an input state and action where state[0] and state[1] are the x and y positions of the state. action[0] and action[1] indicates the action to take (which direction the agent should move) 
@@ -29,7 +29,7 @@ Then if the the state is terminal, we return 0 for the reward and return the sta
         if self.is_terminal(state):
             return state, 0
 ```
-Next we define a function to check whether or not the action that we take will take the agent out of bounds. THe if statement simply checks if the agent is at boundary index and if the next state after the action will be an index that is out of bounds of the 5 by 5 grid. 
+Next we define a function to check whether or not the action that we take will take the agent out of bounds. THe if statement simply checks if the agent is at boundary index and if the next state after the action will be an index that is out of bounds of the 5 by 5 grid. For example. if we are at (0,0) and the action is (0, -1) then clearly the action will take the agent out of bounds. Thus we will return true. We will check all four boundaries.  
 ```python
         def outOfBounds(state, action):
             if (state[0] + action[0] == -1 or state[0] + action[0] == 5
@@ -39,10 +39,12 @@ Next we define a function to check whether or not the action that we take will t
                 return False
 ```
 Then, we can calculate the reward and next state through the following logic:
-1. first check if the agent is at special state A or special state B. If it is at one of the special states, then assign the correct next state according to the problem's specifications and give a reward of either 10 or 5.
+
+1. first check if the agent is at special state A or special state B. If it is at one of the special states, then assign the correct next state according to the problem's specifications and give a reward of either 10 or 5. These will be the first two if statements. 
 2. check if the action will take the agent out of bounds using the outOfBounds function. If it does take the agent out of bounds, give a reward of -1 and do not update the state.
 3. Otherwise, give a reward of 0 and update the state according to the action. 
 4. return the next_state and the reward 
+
 ```python
         next_state = [0, 0]
         if state[0] == 0 and state[1] == 1: 
@@ -69,7 +71,7 @@ Lastly, the size method will simply return the width and height of the grid:
         return self.width, self.height
 ```
 # determining value function in main.py 
-Now, in main.py we first import the necssary dependencies and the class definition from environment.py:
+Now, in main.py we first import the necessary dependencies and the class definition from environment.py:
 ```python
 import numpy as np
 from environment import grid_world
@@ -109,7 +111,7 @@ Next, the transition matrix can be created by creating a matrix P that has width
                 next_state = next_i*HEIGHT + next_j
                 P[current_state, next_state] += ACTION_PROB
 ```
-To calculate the transition matrix, we can loop through each state and sum the probabilities of the transition to a next state by recieving the next state value from the env.interaction method. We can find the sum by looping through every action at that state and getting the result from the env.interaction method. In this case, we do not use the reward. To ensure that we are at the current index, we must treat the current state and next state indices as flattened 5 by 5 arrays. 
+To calculate the transition matrix, we can loop through each state and sum the probabilities of the transition to a next state by recieving the next state value from the env.interaction method. We can find the sum by looping through every action at that state and getting the result from the env.interaction method. We can then calculate the next_state index and then add that to the total sum of the index at the transition matrix index by the action probability (which will be 0.25). For example, the transition matrix index [0, 0] should have a value of 0.5 becacuse the probability of transitioning from state 0 to next_state 0 is the probability of going up (out of bounds) and going to the left (out of bounds) which are both 0.25 and will sum to 0.5. We will repeat this process for every possible state. When we use the env.interaction method,  we do not use the reward. To ensure that we are at the current index, we must treat the current state and next state indices as flattened 5 by 5 arrays. Thus we will multiply the height index by the HEIGHT constant and add it to the current j (column index).  
 
 
 
@@ -141,13 +143,14 @@ We create an grid_world object. Then we call the function to display the values.
 
 # analysis of value function result 
 The result of the calculation of the value function is shown below: 
+
 ![value-function](./images/valuefunction.png)
 
 
 The results show the state-value function. First, the values near the edge are low. This is because there is a higher probability that the agent will go out of bounds. The edge states are lower near the bottom because the getting to the best valued states (A and B) is harder when further away 
 
 
-The result also shows how state A and state B are the best states to be. This is self-explanatory as they have the highest reward. However, the expected return from state A is less than 10 even though the immediate reward is 10. This is because when going from A to the next state (A'), it is likely to go out of bounds in the future. state B meanwhile has a higher expected return than its immediate return because the penalty for going out of bounds is compensated by the chance of getting to state A (immeidate reward of 10).
+The result also shows how state A and state B are the best states to be. This is self-explanatory as they have the highest reward. However, the expected return from state A is less than 10 even though the immediate reward is 10. This is because when going from A to the next state (A'), it is likely to go out of bounds in the future. state B meanwhile has a higher expected return than its immediate return because the penalty for going out of bounds after its next state (B') is compensated by the chance of getting to state A (immediate reward of 10).
 
 
 The other results are self-explanatory. The further the state is away from either A or B, the lower the expected return is. 
