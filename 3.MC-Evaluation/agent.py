@@ -7,7 +7,7 @@ ACTIONS = [np.array([0, -1]),
            np.array([-1, 0]),
            np.array([1, 0])]
 
-TRAINING_EPISODE_NUM = 800000
+TRAINING_EPISODE_NUM = 100 #supposed to be 800000
 
 class AGENT:
     def __init__(self, env, is_upload=False):
@@ -48,6 +48,7 @@ class AGENT:
                             epsilon=0.3, decay_period=20000, decay_rate=0.9):
 
         for episode in range(TRAINING_EPISODE_NUM):
+            print(episode)
             state = self.initialize_episode()
 
             done = False
@@ -56,18 +57,21 @@ class AGENT:
             history = []
 
             # Sequence generation
-            action = self.get_action(state)
-            next_state, reward, done, _ = self.env.step(ACTIONS[action])
-            history.append((state, action, next_state, reward))
-            state = next_state
-            seq_len += 1
-            if seq_len >= max_seq_len:
-                timeout = True
+            while not done and not timeout:
+                action = self.get_action(state)
+                next_state, reward = self.env.interaction(state, action)
+                done = self.env.is_terminal(next_state)
+                history.append((state, action, next_state, reward))
+                state = next_state
+                seq_len += 1
+                if seq_len >= max_seq_len:
+                    timeout = True
+                    break
 
             # Q Value and policy update
             G = 0
-            for state, action, reward, next_state in reversed(history):
-                G = discount * G + reward
+            for state, action, next_state, reward in reversed(history):
+                G = G + reward
                 i, j = state
                 self.Q_values[i][j][action] += alpha * (G - self.Q_values[i][j][action])
                 self.policy[i][j] = self.Q_values[i][j] / np.sum(self.Q_values[i][j])
