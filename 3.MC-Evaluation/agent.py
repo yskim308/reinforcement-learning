@@ -56,10 +56,21 @@ class AGENT:
             history = []
 
             # Sequence generation
+            action = self.get_action(state)
+            next_state, reward, done, _ = self.env.step(ACTIONS[action])
             history.append((state, action, next_state, reward))
+            state = next_state
+            seq_len += 1
+            if seq_len >= max_seq_len:
+                timeout = True
 
             # Q Value and policy update
-            self.Q_values[i][j][a] += alpha * (cum_reward - self.Q_values[i][j][a])
+            G = 0
+            for state, action, reward, next_state in reversed(history):
+                G = discount * G + reward
+                i, j = state
+                self.Q_values[i][j][action] += alpha * (G - self.Q_values[i][j][action])
+                self.policy[i][j] = self.Q_values[i][j] / np.sum(self.Q_values[i][j])
 
 
         self.V_values = np.max(self.Q_values, axis=2)
