@@ -7,7 +7,7 @@ ACTIONS = [np.array([0, -1]),
            np.array([-1, 0]),
            np.array([1, 0])]
 
-TRAINING_EPISODE_NUM = 100 #supposed to be 800000
+TRAINING_EPISODE_NUM = 1000 #supposed to be 800000
 
 class AGENT:
     def __init__(self, env, is_upload=False):
@@ -57,9 +57,9 @@ class AGENT:
             history = []
 
             # Sequence generation
-            while not done and not timeout:
+            while not done or not timeout:
                 action = self.get_action(state)
-                next_state, reward = self.env.interaction(state, action)
+                next_state, reward = self.env.interaction(state, ACTIONS[action])
                 done = self.env.is_terminal(next_state)
                 history.append((state, action, next_state, reward))
                 state = next_state
@@ -69,12 +69,22 @@ class AGENT:
                     break
 
             # Q Value and policy update
-            G = 0
-            for state, action, next_state, reward in reversed(history):
-                G = G + reward
-                i, j = state
-                self.Q_values[i][j][action] += alpha * (G - self.Q_values[i][j][action])
-                self.policy[i][j] = self.Q_values[i][j] / np.sum(self.Q_values[i][j])
+            cum_reward = 0                                                                  # G : For cumulating reward
+
+            # Q Value and policy update
+            for t in range(len(history)-1, -1, -1):                                         
+                (i, j), a, _, reward = history[t]
+                cum_reward = discount * cum_reward + reward                          
+                if history[t][:2] not in [history[i][:2] for i in range(t)]:                
+                    self.Q_values[i][j][a] += alpha * (cum_reward - self.Q_values[i][j][a]) 
+                    max_a = (self.Q_values[i][j] == np.max(self.Q_values[i][j]))            
+                    self.policy[i,j,:] = epsilon / len(ACTIONS)                             
+                    self.policy[i,j,max_a] += (1 - epsilon)/max_a.sum()                     
+
+            if episode % decay_period == 0:                                                 # For every decay period,
+                epsilon *= decay_rate                                                       # Multiply the decay_rate to epsilon
+                print(f"Episode : {episode}, epsilon: {epsilon}")
+
 
 
         self.V_values = np.max(self.Q_values, axis=2)
