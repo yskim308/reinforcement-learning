@@ -47,7 +47,6 @@ class AGENT:
         self.policy = np.zeros((HEIGHT, WIDTH, len(self.ACTIONS))) + 1. / len(self.ACTIONS)
         for i in range(HEIGHT):
             for j in range(WIDTH):
-                self.Q_values()
                 self.policy[i, j, :] = np.zeros(len(ACTIONS))
                 greedy_action_index = np.argmax(self.Q_values[i, j, :])
                 self.policy[i, j, greedy_action_index] = (1. - epsilon)
